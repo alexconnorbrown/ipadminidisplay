@@ -1,47 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Time Elapsed</title>
+    <title>Progress Bar: March to April</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-   </div>Time since March 1st, 2024, 12:00 AM</p> </div>
-</div><p id="timeElapsed">Calculating...
-    <p id="percentToApril">Calculating...</p>
-
+    <div id="timeElapsed">Time since March 1st, 2024, 12:00 AM</div>
+    <div id="progressBarContainer">
+        <div id="progressBar"></div>
+    </div>
+    <div id="percentToApril">Calculating...</div>
+    <h1>Bitcoin Price:</h1>
+    <h2 id="btc_price">Loading...</h2>
     <script src="script.js"></script>
 </body>
-</html>
-
-<!DOCTYPE html>
-<html>
-
-<head>
-  <title>Bitcoin Price</title>
-</head>
-
-<body>
-  <h1>Bitcoin Price:</h1>
-  <h2 id="btc_price"></h2>
-  <script>
-    (function updatePrice() {
-      document.getElementById("btc_price").innerHTML = getBTCPriceUSD() + " USD";
-      setTimeout(updatePrice, 60000);
-    })();
-
-    function getBTCPriceUSD() {
-      var httpRequest = new XMLHttpRequest();
-      httpRequest.open("GET", "https://api.coindesk.com/v1/bpi/currentprice.json", false);
-      httpRequest.send(null);
-      btcJSONText = httpRequest.responseText;
-      btcJSONObject = JSON.parse(btcJSONText);
-      rawBtcPriceUSD = btcJSONObject.bpi.USD.rate_float;
-      return rawBtcPriceUSD.toFixed(2);
-    }
-  </script>
-</body>
-
 </html>
