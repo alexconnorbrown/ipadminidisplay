@@ -21,40 +21,45 @@
     <span class="digit" id="digit8"></span>
   </div>
   <div class="info-section">
-    <span class="info-number"></span>
+    <span class="info-number">420.05</span>
     <span class="info-arrow">&#x2191;</span> <!-- HTML code for upwards arrow -->
   </div>
-  <script>
-    // Fetches the current Bitcoin price from Binance and updates the display
-    async function fetchAndUpdateCurrentPrice() {
-      try {
-        const response = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
-        const data = await response.json();
-        const currentPrice = parseFloat(data.price).toFixed(2);
-        displayPrice(currentPrice);
-      } catch (error) {
-        console.error("Failed to fetch current price:", error);
-      }
+<script>
+    function updatePrice() {
+      var httpRequest = new XMLHttpRequest();
+      httpRequest.onreadystatechange = function() {
+        if (httpRequest.readyState == XMLHttpRequest.DONE && httpRequest.status == 200) {
+          var btcJSONObject = JSON.parse(httpRequest.responseText);
+          var btcPriceUSD = btcJSONObject.bpi.USD.rate_float.toFixed(2);
+          displayPrice(btcPriceUSD);
+        }
+      };
+      httpRequest.open("GET", "https://api.coindesk.com/v1/bpi/currentprice.json", true);
+      httpRequest.send();
     }
-  
-    // Displays the current price across the digit spans
+
     function displayPrice(price) {
-      const priceStr = price.toString();
-      const digits = priceStr.split('');
-      const digitElems = document.querySelectorAll('.digit, .decimal');
-  
-      let digitIndex = 1; // Start from the second digit for aesthetic reasons
-      digits.forEach((digit) => {
-        if (digitIndex < digitElems.length) {
+      var priceStr = price.toString();
+      var digits = priceStr.split("");
+      var digitElems = document.querySelectorAll('.digit, .decimal');
+      
+      // Start filling from the second element (index 1) of digitElems
+      var digitIndex = 1;
+      digits.forEach(function(digit) {
+        if (digitIndex < digitElems.length) { // Ensure we don't overflow the available spans
+          if (digit === ".") {
+            digitElems[digitIndex].classList.add('decimal');
+          } else {
+            digitElems[digitIndex].classList.remove('decimal');
+          }
           digitElems[digitIndex].textContent = digit;
           digitIndex++;
         }
       });
-  
-      setTimeout(fetchAndUpdateCurrentPrice, 1000); // Refresh every second
+
+      setTimeout(updatePrice, 1000); // Refresh every minute
     }
-  
-    // Initial calls to start the process
-    fetchAndUpdateCurrentPrice();
-  </script>
-  
+
+    // Initialize price update
+    updatePrice();
+</script>
