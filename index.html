@@ -8,43 +8,58 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <p>Time since March 1st, 2024, 12:00 AM</p>
-    <p id="timeElapsed">Calculating...</p>
-    <p id="percentToApril">Calculating...</p>
-    <div id="progressBarContainer">
-        <div id="progressBar"></div>
-    </div>
-
-    <script src="script.js"></script>
-</body>
-</html>
-
-<!DOCTYPE html>
-<html>
-
-<head>
-  <title>Bitcoin Price</title>
-</head>
-
-<body>
-  <h1>Bitcoin Price:</h1>
-  <h2 id="btc_price"></h2>
+  <div class="number-display">
+    <span class="digit" id="digit1">0</span> <!-- This will remain static if needed -->
+    <!-- The following spans are placeholders for the price -->
+    <span class="digit" id="digit2"></span>
+    <span class="digit" id="digit3"></span>
+    <span class="digit" id="digit4"></span>
+    <span class="digit" id="digit5"></span>
+    <span class="digit" id="digit6"></span>
+    <span class="decimal">.</span>
+    <span class="digit" id="digit7"></span>
+    <span class="digit" id="digit8"></span>
+  </div>
+  <div class="info-section">
+    <span class="info-number">...</span>
+    <span class="info-arrow">&#x2191;</span> <!-- HTML code for upwards arrow -->
+  </div>
   <script>
-    (function updatePrice() {
-      document.getElementById("btc_price").innerHTML = getBTCPriceUSD() + " USD";
-      setTimeout(updatePrice, 60000);
-    })();
-
-    function getBTCPriceUSD() {
+    function updatePrice() {
       var httpRequest = new XMLHttpRequest();
-      httpRequest.open("GET", "https://api.coindesk.com/v1/bpi/currentprice.json", false);
-      httpRequest.send(null);
-      btcJSONText = httpRequest.responseText;
-      btcJSONObject = JSON.parse(btcJSONText);
-      rawBtcPriceUSD = btcJSONObject.bpi.USD.rate_float;
-      return rawBtcPriceUSD.toFixed(2);
+      httpRequest.onreadystatechange = function() {
+        if (httpRequest.readyState == XMLHttpRequest.DONE && httpRequest.status == 200) {
+          var btcJSONObject = JSON.parse(httpRequest.responseText);
+          var btcPriceUSD = btcJSONObject.bpi.USD.rate_float.toFixed(2);
+          displayPrice(btcPriceUSD);
+        }
+      };
+      httpRequest.open("GET", "https://api.coindesk.com/v1/bpi/currentprice.json", true);
+      httpRequest.send();
     }
-  </script>
-</body>
 
-</html>
+    function displayPrice(price) {
+      var priceStr = price.toString();
+      var digits = priceStr.split("");
+      var digitElems = document.querySelectorAll('.digit, .decimal');
+      
+      // Start filling from the second element (index 1) of digitElems
+      var digitIndex = 1;
+      digits.forEach(function(digit) {
+        if (digitIndex < digitElems.length) { // Ensure we don't overflow the available spans
+          if (digit === ".") {
+            digitElems[digitIndex].classList.add('decimal');
+          } else {
+            digitElems[digitIndex].classList.remove('decimal');
+          }
+          digitElems[digitIndex].textContent = digit;
+          digitIndex++;
+        }
+      });
+
+      setTimeout(updatePrice, 1000); // Refresh every minute
+    }
+
+    // Initialize price update
+    updatePrice();
+</script>
